@@ -110,13 +110,7 @@ export function CourseForm({ onSubmit, initialCourse, onCancel }) {
           {form.documents.map((document, index) => (
             <div key={`doc-${index}`} className="rounded-md border border-slate-100 p-2">
               <input className="mb-2 w-full rounded-md border border-slate-200 px-3 py-2" placeholder="Titre du document" value={document.title} onChange={(e) => updateDocument(index, 'title', e.target.value)} />
-              <input
-                className="mb-2 w-full rounded-md border border-slate-200 px-3 py-2"
-                type="text"
-                placeholder="URL du document ou contenu importé"
-                value={document.url}
-                onChange={(e) => updateDocument(index, 'url', e.target.value)}
-              />
+              <input className="mb-2 w-full rounded-md border border-slate-200 px-3 py-2" type="url" placeholder="URL du document" value={document.url} onChange={(e) => updateDocument(index, 'url', e.target.value)} />
               <label className="mb-2 block rounded-md border border-dashed border-slate-300 px-3 py-2 text-sm text-slate-600">
                 <span className="mb-1 block font-medium">ou importer depuis mon ordinateur</span>
                 <input
