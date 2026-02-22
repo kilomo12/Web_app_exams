@@ -57,8 +57,16 @@ Application full-stack moderne pour gérer les cours universitaires et le calend
 - `ects` (Number, requis)
 - `documents` (Array, optionnel): liste de documents liés au cours
   - `title` (String, requis)
-  - `url` (String, requis)
-  - `type` (`pdf`, `image`, `other`)
+  - `url` (String, requis) : URL web ou fichier importé localement (encodé en Data URL)
+  - `type` (`pdf`, `word`, `image`, `other`)
+
+### Import de fichiers depuis l'ordinateur
+
+Dans le formulaire de cours, chaque document peut désormais être :
+- ajouté via une URL classique,
+- ou importé directement depuis votre ordinateur grâce au champ **"ou importer depuis mon ordinateur"**.
+
+Le fichier est encodé côté frontend puis enregistré dans MongoDB dans `documents.url`.
 
 ### Collection `exams`
 - `course` (ObjectId, ref: `Course`, requis)
