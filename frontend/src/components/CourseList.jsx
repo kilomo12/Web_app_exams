@@ -1,12 +1,37 @@
 import { useMemo, useState } from 'react';
 import { CourseForm } from './CourseForm';
 
-const getViewerUrl = (document) => {
-  if (document.url.startsWith('data:') || document.type === 'pdf' || document.type === 'image') {
-    return document.url;
+const normalizeDocumentUrl = (url = '') => {
+  const trimmed = url.trim();
+
+  if (!trimmed) return '';
+  if (/^(data:|blob:|https?:|file:)/i.test(trimmed)) return trimmed;
+
+  if (/^[a-zA-Z]:\\/.test(trimmed)) {
+    return `file:///${trimmed.replace(/\\/g, '/')}`;
   }
 
-  return `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(document.url)}`;
+  if (trimmed.startsWith('/')) {
+    return `file://${trimmed}`;
+  }
+
+  return trimmed;
+};
+
+const getViewerUrl = (document) => {
+  const normalizedUrl = normalizeDocumentUrl(document.url);
+
+  if (
+    normalizedUrl.startsWith('data:') ||
+    normalizedUrl.startsWith('blob:') ||
+    normalizedUrl.startsWith('file:') ||
+    document.type === 'pdf' ||
+    document.type === 'image'
+  ) {
+    return normalizedUrl;
+  }
+
+  return `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(normalizedUrl)}`;
 };
 
 export function CourseList({ courses, onDelete, onUpdate }) {
@@ -17,6 +42,9 @@ export function CourseList({ courses, onDelete, onUpdate }) {
     () => courses.find((course) => course._id === editingId),
     [courses, editingId]
   );
+
+  const selectedDocumentUrl = selectedDocument ? getViewerUrl(selectedDocument) : '';
+  const isLocalFile = selectedDocumentUrl.startsWith('file:');
 
   return (
     <div className="card">
@@ -49,7 +77,7 @@ export function CourseList({ courses, onDelete, onUpdate }) {
                       <li key={`${course._id}-${document.url}-${index}`} className="flex items-center gap-2">
                         <a
                           className="text-indigo-600 hover:text-indigo-800 hover:underline"
-                          href={document.url}
+                          href={getViewerUrl(document)}
                           target="_blank"
                           rel="noreferrer"
                         >
@@ -89,7 +117,15 @@ export function CourseList({ courses, onDelete, onUpdate }) {
                 Fermer
               </button>
             </div>
-            <iframe src={getViewerUrl(selectedDocument)} title={selectedDocument.title} className="h-[calc(80vh-56px)] w-full rounded border" />
+            {isLocalFile ? (
+              <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+                <p className="font-medium">Ce document pointe vers un fichier local.</p>
+                <p className="mt-1">Pour des raisons de sécurité, le navigateur bloque souvent l'aperçu des URL <code>file://</code> depuis une application web.</p>
+                <p className="mt-1">Importez le PDF depuis le formulaire du cours pour l'enregistrer dans l'application et l'ouvrir sans blocage.</p>
+              </div>
+            ) : (
+              <iframe src={selectedDocumentUrl} title={selectedDocument.title} className="h-[calc(80vh-56px)] w-full rounded border" />
+            )}
           </div>
         </div>
       )}
