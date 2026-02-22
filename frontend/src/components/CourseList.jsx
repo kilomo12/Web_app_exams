@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { CourseForm } from './CourseForm';
 
 const getViewerUrl = (document) => {
-  if (document.type === 'pdf' || document.type === 'image') {
+  if (document.url.startsWith('data:') || document.type === 'pdf' || document.type === 'image') {
     return document.url;
   }
 
