@@ -6,8 +6,11 @@ import {
   getUpcomingExams,
   updateExam,
 } from '../controllers/examController.js';
+import { requireAuth } from '../middlewares/authMiddleware.js';
 
 const router = Router();
+
+router.use(requireAuth);
 
 router.get('/', getExams);
 router.get('/upcoming', getUpcomingExams);

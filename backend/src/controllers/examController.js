@@ -1,3 +1,4 @@
+import { Course } from '../models/Course.js';
 import { Exam } from '../models/Exam.js';
 
 const SESSION_LABELS = {
@@ -22,19 +23,26 @@ const formatUpcoming = (exams) =>
     .sort((a, b) => new Date(a.date) - new Date(b.date))
     .slice(0, 5);
 
-export const getExams = async (_req, res) => {
-  const exams = await Exam.find().populate('course', 'name professor ects').sort({ createdAt: -1 });
+export const getExams = async (req, res) => {
+  const exams = await Exam.find({ user: req.user._id })
+    .populate('course', 'name professor ects')
+    .sort({ createdAt: -1 });
   res.json(exams);
 };
 
-export const getUpcomingExams = async (_req, res) => {
-  const exams = await Exam.find().populate('course', 'name professor');
+export const getUpcomingExams = async (req, res) => {
+  const exams = await Exam.find({ user: req.user._id }).populate('course', 'name professor');
   res.json(formatUpcoming(exams));
 };
 
 export const createExam = async (req, res, next) => {
   try {
-    const exam = await Exam.create(req.body);
+    const ownsCourse = await Course.exists({ _id: req.body.course, user: req.user._id });
+    if (!ownsCourse) {
+      return res.status(403).json({ message: 'Cours non autorisé.' });
+    }
+
+    const exam = await Exam.create({ ...req.body, user: req.user._id });
     const populated = await exam.populate('course', 'name professor ects');
     res.status(201).json(populated);
   } catch (error) {
@@ -43,7 +51,14 @@ export const createExam = async (req, res, next) => {
 };
 
 export const updateExam = async (req, res) => {
-  const exam = await Exam.findByIdAndUpdate(req.params.id, req.body, {
+  if (req.body.course) {
+    const ownsCourse = await Course.exists({ _id: req.body.course, user: req.user._id });
+    if (!ownsCourse) {
+      return res.status(403).json({ message: 'Cours non autorisé.' });
+    }
+  }
+
+  const exam = await Exam.findOneAndUpdate({ _id: req.params.id, user: req.user._id }, req.body, {
     new: true,
     runValidators: true,
   }).populate('course', 'name professor ects');
@@ -56,7 +71,7 @@ export const updateExam = async (req, res) => {
 };
 
 export const deleteExam = async (req, res) => {
-  const deleted = await Exam.findByIdAndDelete(req.params.id);
+  const deleted = await Exam.findOneAndDelete({ _id: req.params.id, user: req.user._id });
 
   if (!deleted) {
     return res.status(404).json({ message: 'Examen introuvable' });
