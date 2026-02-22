@@ -31,7 +31,7 @@ export default function App() {
     <main className="mx-auto min-h-screen max-w-6xl space-y-6 p-4 md:p-8">
       <header>
         <h1 className="text-2xl font-bold text-slate-900 md:text-3xl">Gestion des examens universitaires</h1>
-        <p className="mt-1 text-slate-600">Suivez vos matières et vos dates d'examens en un seul endroit.</p>
+        <p className="mt-1 text-slate-600">Suivez et éditez vos contenus pédagogiques et vos examens en un seul endroit.</p>
       </header>
 
       <UpcomingExamsDashboard exams={upcoming} />
@@ -55,13 +55,22 @@ export default function App() {
       <section className="grid gap-4 lg:grid-cols-2">
         <CourseList
           courses={courses}
+          onUpdate={async (id, payload) => {
+            await api.updateCourse(id, payload);
+            await loadData();
+          }}
           onDelete={async (id) => {
             await api.deleteCourse(id);
             await loadData();
           }}
         />
         <ExamList
+          courses={courses}
           exams={exams}
+          onUpdate={async (id, payload) => {
+            await api.updateExam(id, payload);
+            await loadData();
+          }}
           onDelete={async (id) => {
             await api.deleteExam(id);
             await loadData();

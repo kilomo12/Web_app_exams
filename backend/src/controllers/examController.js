@@ -1,21 +1,35 @@
 import { Exam } from '../models/Exam.js';
 
-export const getExams = async (_req, res) => {
-  const exams = await Exam.find()
-    .populate('course', 'name professor ects')
-    .sort({ date: 1 });
+const SESSION_LABELS = {
+  session_1: 'Session 1',
+  session_2: 'Session 2',
+  rattrapage: 'Rattrapage',
+};
 
+const formatUpcoming = (exams) =>
+  exams
+    .flatMap((exam) =>
+      exam.sessions.map((session) => ({
+        examId: exam._id,
+        course: exam.course,
+        session: session.key,
+        sessionLabel: SESSION_LABELS[session.key],
+        date: session.date,
+        room: session.room,
+      }))
+    )
+    .filter((item) => new Date(item.date) >= new Date())
+    .sort((a, b) => new Date(a.date) - new Date(b.date))
+    .slice(0, 5);
+
+export const getExams = async (_req, res) => {
+  const exams = await Exam.find().populate('course', 'name professor ects').sort({ createdAt: -1 });
   res.json(exams);
 };
 
 export const getUpcomingExams = async (_req, res) => {
-  const now = new Date();
-  const exams = await Exam.find({ date: { $gte: now } })
-    .populate('course', 'name professor')
-    .sort({ date: 1 })
-    .limit(5);
-
-  res.json(exams);
+  const exams = await Exam.find().populate('course', 'name professor');
+  res.json(formatUpcoming(exams));
 };
 
 export const createExam = async (req, res, next) => {

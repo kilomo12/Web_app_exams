@@ -1,15 +1,10 @@
 import mongoose from 'mongoose';
 
-const examSchema = new mongoose.Schema(
+const examSessionSchema = new mongoose.Schema(
   {
-    course: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Course',
-      required: true,
-    },
-    session: {
+    key: {
       type: String,
-      enum: ['session_1', 'rattrapage'],
+      enum: ['session_1', 'session_2', 'rattrapage'],
       required: true,
     },
     date: {
@@ -22,11 +17,33 @@ const examSchema = new mongoose.Schema(
       trim: true,
     },
   },
+  { _id: false }
+);
+
+const examSchema = new mongoose.Schema(
+  {
+    course: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Course',
+      required: true,
+      unique: true,
+    },
+    sessions: {
+      type: [examSessionSchema],
+      validate: {
+        validator: (value) => {
+          if (!Array.isArray(value) || value.length !== 3) return false;
+          const keys = value.map((session) => session.key).sort();
+          return JSON.stringify(keys) === JSON.stringify(['rattrapage', 'session_1', 'session_2']);
+        },
+        message: 'Un examen doit contenir Session 1, Session 2 et Rattrapage.',
+      },
+      required: true,
+    },
+  },
   {
     timestamps: true,
   }
 );
-
-examSchema.index({ course: 1, session: 1 }, { unique: true });
 
 export const Exam = mongoose.model('Exam', examSchema);
