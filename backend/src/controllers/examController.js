@@ -18,10 +18,14 @@ export const getUpcomingExams = async (_req, res) => {
   res.json(exams);
 };
 
-export const createExam = async (req, res) => {
-  const exam = await Exam.create(req.body);
-  const populated = await exam.populate('course', 'name professor ects');
-  res.status(201).json(populated);
+export const createExam = async (req, res, next) => {
+  try {
+    const exam = await Exam.create(req.body);
+    const populated = await exam.populate('course', 'name professor ects');
+    res.status(201).json(populated);
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const updateExam = async (req, res) => {
