@@ -2,7 +2,7 @@
  * @typedef {Object} CourseDocument
  * @property {string} title
  * @property {string} url
- * @property {'pdf'|'image'|'other'} type
+ * @property {'pdf'|'word'|'image'|'other'} type
  */
 
 /**
@@ -15,10 +15,19 @@
  */
 
 /**
+ * @typedef {'session_1'|'session_2'|'rattrapage'} SessionKey
+ */
+
+/**
+ * @typedef {Object} ExamSession
+ * @property {SessionKey} key
+ * @property {string} date
+ * @property {string} room
+ */
+
+/**
  * @typedef {Object} Exam
  * @property {string} _id
  * @property {Course} course
- * @property {'session_1'|'rattrapage'} session
- * @property {string} date
- * @property {string} room
+ * @property {ExamSession[]} sessions
  */

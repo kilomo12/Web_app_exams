@@ -35,7 +35,7 @@ const courseSchema = new mongoose.Schema(
         },
         type: {
           type: String,
-          enum: ['pdf', 'image', 'other'],
+          enum: ['pdf', 'word', 'image', 'other'],
           default: 'other',
         },
       },
