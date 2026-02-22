@@ -22,6 +22,12 @@ const examSessionSchema = new mongoose.Schema(
 
 const examSchema = new mongoose.Schema(
   {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      index: true,
+    },
     course: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Course',

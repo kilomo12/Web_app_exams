@@ -76,6 +76,17 @@ Le fichier est encodé côté frontend puis enregistré dans MongoDB dans `docum
 
 Un cours peut avoir plusieurs examens (session 1 et rattrapage), relation **1-N** via `Exam.course`.
 
+
+## Authentification et multi-utilisateurs
+
+- Chaque utilisateur peut désormais **s'inscrire** et **se connecter**.
+- Les données (cours et examens) sont isolées par utilisateur : un compte ne voit que ses propres données.
+- Endpoints d'authentification :
+  - `POST /api/auth/register`
+  - `POST /api/auth/login`
+  - `GET /api/auth/me`
+  - `POST /api/auth/logout`
+
 ## Démarrage rapide
 
 ### Backend

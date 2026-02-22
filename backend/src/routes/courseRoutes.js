@@ -5,8 +5,11 @@ import {
   getCourses,
   updateCourse,
 } from '../controllers/courseController.js';
+import { requireAuth } from '../middlewares/authMiddleware.js';
 
 const router = Router();
+
+router.use(requireAuth);
 
 router.get('/', getCourses);
 router.post('/', createCourse);

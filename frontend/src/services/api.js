@@ -1,14 +1,29 @@
 const API_URL = 'http://localhost:5000/api';
 
 const request = async (path, options = {}) => {
+  const token = localStorage.getItem('auth_token');
+  const baseHeaders = { 'Content-Type': 'application/json' };
+  if (token) {
+    baseHeaders.Authorization = `Bearer ${token}`;
+  }
+
   const response = await fetch(`${API_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
+    headers: { ...baseHeaders, ...(options.headers || {}) },
     ...options,
   });
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(error || 'API error');
+    const errorText = await response.text();
+    let message = errorText || 'API error';
+
+    try {
+      const parsed = JSON.parse(errorText);
+      message = parsed.message || message;
+    } catch {
+      // Ignore JSON parsing errors.
+    }
+
+    throw new Error(message);
   }
 
   if (response.status === 204) {
@@ -19,6 +34,11 @@ const request = async (path, options = {}) => {
 };
 
 export const api = {
+  register: (payload) => request('/auth/register', { method: 'POST', body: JSON.stringify(payload) }),
+  login: (payload) => request('/auth/login', { method: 'POST', body: JSON.stringify(payload) }),
+  me: () => request('/auth/me'),
+  logout: () => request('/auth/logout', { method: 'POST' }),
+
   getCourses: () => request('/courses'),
   createCourse: (payload) =>
     request('/courses', { method: 'POST', body: JSON.stringify(payload) }),
