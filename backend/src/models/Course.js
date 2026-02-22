@@ -20,6 +20,26 @@ const courseSchema = new mongoose.Schema(
       min: 1,
       max: 30,
     },
+    documents: [
+      {
+        title: {
+          type: String,
+          required: true,
+          trim: true,
+          minlength: 2,
+        },
+        url: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+        type: {
+          type: String,
+          enum: ['pdf', 'image', 'other'],
+          default: 'other',
+        },
+      },
+    ],
   },
   {
     timestamps: true,

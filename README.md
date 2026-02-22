@@ -55,6 +55,10 @@ Application full-stack moderne pour gérer les cours universitaires et le calend
 - `name` (String, requis)
 - `professor` (String, requis)
 - `ects` (Number, requis)
+- `documents` (Array, optionnel): liste de documents liés au cours
+  - `title` (String, requis)
+  - `url` (String, requis)
+  - `type` (`pdf`, `image`, `other`)
 
 ### Collection `exams`
 - `course` (ObjectId, ref: `Course`, requis)
