@@ -46,9 +46,21 @@ export function CourseList({ courses, onDelete, onUpdate }) {
                 {course.documents?.length > 0 && (
                   <ul className="mt-2 space-y-1 text-sm">
                     {course.documents.map((document, index) => (
-                      <li key={`${course._id}-${document.url}-${index}`}>
-                        <button className="text-left text-indigo-600 hover:text-indigo-800 hover:underline" onClick={() => setSelectedDocument(document)}>
+                      <li key={`${course._id}-${document.url}-${index}`} className="flex items-center gap-2">
+                        <a
+                          className="text-indigo-600 hover:text-indigo-800 hover:underline"
+                          href={document.url}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
                           {document.title} ({document.type})
+                        </a>
+                        <button
+                          type="button"
+                          className="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-600 hover:bg-slate-200"
+                          onClick={() => setSelectedDocument(document)}
+                        >
+                          Aperçu
                         </button>
                       </li>
                     ))}
